@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Setup Environment
+sudo apt install python3-venv
+python3 -m venv venv
+source venv/bin/activate
+
 if [ $# -eq 0 ]; then
   DATA_DIR="./"
 else
