@@ -21,6 +21,11 @@ from object_detector import ObjectDetector
 from object_detector import ObjectDetectorOptions
 import utils
 
+def get_bbox_area(bounding_box):
+    return abs(bounding_box.right - bounding_box.left) * abs(bounding_box.top - bounding_box.bottom)
+
+def get_largest_bbox(detections):
+    return max(detections, key=lambda x:get_bbox_area(x.bounding_box))
 
 def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
         enable_edgetpu: bool) -> None:
@@ -76,8 +81,10 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
 
     print(detections)
 
+    detection = get_largest_bbox(detections)
+
     # Draw keypoints and edges on input image
-    image = utils.visualize(image, detections)
+    image = utils.visualize(image, [detection])
 
     # Calculate the FPS
     if counter % fps_avg_frame_count == 0:
