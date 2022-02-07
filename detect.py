@@ -20,6 +20,7 @@ import cv2
 from object_detector import ObjectDetector
 from object_detector import ObjectDetectorOptions
 import utils
+import pyttsx3
 
 def get_bbox_area(bounding_box):
     return abs(bounding_box.right - bounding_box.left) * abs(bounding_box.top - bounding_box.bottom)
@@ -48,6 +49,9 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
   cap = cv2.VideoCapture(camera_id)
   cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
   cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+  # text to speech library
+  speech = pyttsx3.init()
 
   # Visualization parameters
   row_size = 20  # pixels
@@ -85,6 +89,9 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
 
     # Draw keypoints and edges on input image
     image = utils.visualize(image, [detection])
+    category = max(detection.categories, key=lambda x: x.score)
+    speech.say(category.label)
+    speech.runAndWait()
 
     # Calculate the FPS
     if counter % fps_avg_frame_count == 0:
