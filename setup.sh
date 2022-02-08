@@ -4,6 +4,7 @@
 sudo apt install python3-venv
 python3 -m venv venv
 source venv/bin/activate
+sudo apt install espeak
 
 if [ $# -eq 0 ]; then
   DATA_DIR="./"
