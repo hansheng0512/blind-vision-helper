@@ -26,7 +26,9 @@ def get_bbox_area(bounding_box):
     return abs(bounding_box.right - bounding_box.left) * abs(bounding_box.top - bounding_box.bottom)
 
 def get_largest_bbox(detections):
-    return max(detections, key=lambda x:get_bbox_area(x.bounding_box))
+    if len(detections) == 0:
+        return []
+    return [max(detections, key=lambda x:get_bbox_area(x.bounding_box))]
 
 def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
         enable_edgetpu: bool) -> None:
@@ -88,10 +90,13 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
     detection = get_largest_bbox(detections)
 
     # Draw keypoints and edges on input image
-    image = utils.visualize(image, [detection])
-    category = max(detection.categories, key=lambda x: x.score)
-    speech.say(category.label)
-    speech.runAndWait()
+    image = utils.visualize(image, detection)
+
+    if len(detection) != 0:
+        data = detection[0]
+        category = max(data.categories, key=lambda x: x.score)
+        speech.say(category.label)
+        speech.runAndWait()
 
     # Calculate the FPS
     if counter % fps_avg_frame_count == 0:
