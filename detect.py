@@ -101,6 +101,7 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
         category = max(data.categories, key=lambda x: x.score)
         label = category.label
         if label is not None and label != cur_class:
+            cur_class = label
             speech.say(label)
             speech.runAndWait()
 
