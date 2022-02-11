@@ -43,9 +43,12 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
     enable_edgetpu: True/False whether the model is a EdgeTPU model.
   """
 
+
   # Variables to calculate FPS
   counter, fps = 0, 0
   start_time = time.time()
+
+  cur_class = None
 
   # Start capturing video input from the camera
   cap = cv2.VideoCapture(camera_id)
@@ -54,6 +57,7 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
 
   # text to speech library
   speech = pyttsx3.init()
+  speech.setProperty('rate', 125)
 
   # Visualization parameters
   row_size = 20  # pixels
@@ -95,8 +99,10 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
     if len(detection) != 0:
         data = detection[0]
         category = max(data.categories, key=lambda x: x.score)
-        speech.say(category.label)
-        speech.runAndWait()
+        label = category.label
+        if label is not None and label != cur_class:
+            speech.say(label)
+            speech.runAndWait()
 
     # Calculate the FPS
     if counter % fps_avg_frame_count == 0:
