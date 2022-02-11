@@ -21,6 +21,7 @@ from object_detector import ObjectDetector
 from object_detector import ObjectDetectorOptions
 import utils
 import pyttsx3
+from detection_counter import DetectionCounter
 
 def get_bbox_area(bounding_box):
     return abs(bounding_box.right - bounding_box.left) * abs(bounding_box.top - bounding_box.bottom)
@@ -48,7 +49,7 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
   counter, fps = 0, 0
   start_time = time.time()
 
-  cur_class = None
+  detection_counter = DetectionCounter()
 
   # Start capturing video input from the camera
   cap = cv2.VideoCapture(camera_id)
@@ -100,9 +101,11 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
         data = detection[0]
         category = max(data.categories, key=lambda x: x.score)
         label = category.label
-        if label is not None and label != cur_class:
-            cur_class = label
-            speech.say(label)
+
+        detection_counter.compare_and_update(label)
+
+        if detection_counter.count == 3:
+            speech.say(detection_counter.current_class)
             speech.runAndWait()
 
     # Calculate the FPS
