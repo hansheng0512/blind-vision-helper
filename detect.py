@@ -95,18 +95,27 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
     detection = get_largest_bbox(detections)
 
     # Draw keypoints and edges on input image
-    image = utils.visualize(image, detection)
+    image = utils.visualize(image, detections)
 
-    if len(detection) != 0:
-        data = detection[0]
-        category = max(data.categories, key=lambda x: x.score)
-        label = category.label
+    # if len(detection) != 0:
+    #     data = detection[0]
+    #     category = max(data.categories, key=lambda x: x.score)
+    #     label = category.label
+    #
+    #     detection_counter.compare_and_update(label)
+    #
+    #     if detection_counter.count == 3:
+    #         speech.say(detection_counter.current_class)
+    #         speech.runAndWait()
 
-        detection_counter.compare_and_update(label)
+    if len(detections) != 0:
+        items = set()
+        for detection in detections:
+            category = max(detection.categories, key=lambda x: x.score)
+            items.add(category.label)
 
-        if detection_counter.count == 3:
-            speech.say(detection_counter.current_class)
-            speech.runAndWait()
+        speech.say(f"{' and '.join(items)} detected within 1 meter")
+        speech.runAndWait()
 
     # Calculate the FPS
     if counter % fps_avg_frame_count == 0:
